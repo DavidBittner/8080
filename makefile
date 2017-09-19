@@ -1,32 +1,36 @@
-C = clang
+C = clang++
 
-SRC = $(wildcard ./src/*.c)
-INC = $(wildcard ./src/*.h)
+SRC = $(wildcard ./src/*.cc)
+INC = $(wildcard ./src/*.hh)
 
-OBJS = $(SRC:.c=.o)
+OBJS = $(SRC:.cc=.o)
+DEPFILES = $(SRC:.cc=.d)
 
 BIN = run.out
 
-FLAGS = -Wall -Werror -g -I./inc/
-LFLAGS = 
+FLAGS = -Wall -Werror -g -Iinc/ -I/usr/include/spdlog -std=c++14 -MMD
+LFLAGS = -pthread
 
 all: $(OBJS)
 	@echo "COMPILER INFO"
 	@echo "------------------------------------"
 	@$(C) --version
-	@$(C) $(LFLAGS) $(OBJS) -o $(BIN)
+	@$(C) $(FLAGS) $(LFLAGS) $(OBJS) -o $(BIN)
 	@echo ""
 	@echo "$(BIN) generated successfully."
 	@echo "------------------------------------"
 
-%.o: %.c
-	@echo "Compiling $< with dependencies $^..."
-	$(C) $(FLAGS) -c $< -o $@
-	@echo "Compiled to $@"
+-include $(DEPFILES)
+
+%.o: %.cc
+	@echo "Building $<"
+	@$(C) $(FLAGS) -c $< -o $@
+	@echo "Built $< to $@."
 
 clean:
-	@rm $(OBJS)
-	@rm $(BIN)
+	@rm -f $(OBJS)
+	@rm -f $(BIN)
+	@rm -f $(DEPFILES)
 	@echo Cleaned.
 
 force:
