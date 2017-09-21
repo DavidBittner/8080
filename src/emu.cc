@@ -56,7 +56,7 @@ void Emulator_8080::step()
             return;
         }
     }
-    pc+= skipbytes;
+    pc += skipbytes;
 }
 
 bool Emulator_8080::isActive()
