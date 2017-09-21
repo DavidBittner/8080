@@ -20,6 +20,14 @@ Emulator_8080::Emulator_8080( std::shared_ptr<char> rom, int romlen ) :
     logger->log( spd::level::info, "Initialized emulator." );
 }
 
+template<class t>
+std::string numToHex( t in )
+{
+    std::stringstream str;
+    str << "0x" << std::setfill('0') << std::setw(sizeof(in)*2) << std::hex << static_cast<int>(in);
+    return str.str().c_str();
+}
+
 void Emulator_8080::step()
 {
     if( pc == romlen )
@@ -49,8 +57,8 @@ void Emulator_8080::step()
         }
         case inst::JMP:
         {
-            skipbytes = 3;
-            auto test = readArgs( skipbytes-1 );
+            skipbytes = 0;
+            auto test = readArgs( 2 );
 
             //Take the address bytes and stick them together.
             //Each is a byte, we want a 16 bit address.
@@ -63,11 +71,8 @@ void Emulator_8080::step()
         }
         default:
         {
-            //Ew. I couldn't figure out how to do this with spd. I'm sorry :c
-            std::stringstream str;
-            str << "0x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(cur);
-
-            logger->error( "Undefined instruction: '{}'", str.str() );
+            std::string hex = numToHex(static_cast<uint8_t>(cur));
+            logger->error( "Undefined instruction: '{}'", hex );
             alive = false;
             return;
         }
