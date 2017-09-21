@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <spdlog.h>
+#include <iomanip>
 
 #include "emu.hh"
 
