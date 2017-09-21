@@ -8,8 +8,10 @@ So, here goes!
 
 This likely won't cover the full opset of the chip. I'm just aiming for emulation of Space Invaders.
 
+# Dependencies
+
+* spdlog (which includes C++ fmt)
+
 # Future
 
-I'm likely going to be using SDL for graphical rendering but I'll jump that hurdle when I get to it.
-
-Input will definitely have to be handled by either SDL or OpenGL. OpenGL seems like a strange choice due to a lack of a rasterizing rendering system. Counter-intuitive when reading from something such as a video buffer.
+SDL will be used for input processing as well as graphical rendering, but we'll see if I get there.
