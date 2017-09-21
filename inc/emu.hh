@@ -4,7 +4,11 @@
 #include <memory>
 #include <vector>
 
+#include <cstdint>
+
 #include <spdlog.h>
+
+#define MEMORY_SIZE 1024*1000
 
 enum class inst;
 
@@ -20,12 +24,15 @@ public:
     int getinst() const;
 
 private:
-    std::vector<int> readArgs( int count );
+    std::vector<uint8_t> readArgs( int count );
 
     bool alive;
 
     int pc;
     int romlen;
+
+    char *mem;
+    uint8_t a, b, c, d, e, h, l;
 
     inst cur;
 
@@ -41,6 +48,7 @@ enum class inst
     STAXB   = 0x02,
     INXB    = 0x03,
     INRB    = 0x04,
+    JMP     = 0xC3
 };
 
 #endif
