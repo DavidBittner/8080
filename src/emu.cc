@@ -66,6 +66,7 @@ void Emulator_8080::step()
             adr = (adr<<8)|test.at(0);
 
             pc = adr;
+            logger->log( spd::level::info, "Jumping to {}...", numToHex(adr) );
 
             break;
         }
