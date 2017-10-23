@@ -17,6 +17,8 @@ Emulator_8080::Emulator_8080( std::shared_ptr<char> rom, int romlen ) :
 
     cur = inst::NONE;
 
+    this->mem = new uint8_t[16000];
+
     logger->log( spd::level::info, "Initialized emulator." );
 }
 
@@ -55,18 +57,54 @@ void Emulator_8080::step()
             skipbytes = 1;
             break;
         }
+        case inst::LXIBD16: 
+        {
+            auto args = readArgs( 2 );
+
+            this->b = args.at(1);
+            this->c = args.at(0);
+
+            skipbytes = 3;
+            logger->log( spd::level::info, "LXI B" );
+
+            break;
+        }
+        case inst::MVIBD8:
+        {
+            auto args = readArgs( 1 );
+
+            uint8_t immediate = rom.get()[pc+1];
+            this->b = immediate;
+
+            skipbytes = 2;
+            logger->log( spd::level::info, "MVI B [{}]", immediate );
+        }
+        case inst::LXISPD16:
+        {
+            auto args = readArgs( 2 );
+
+            uint16_t tmp = args.at(1);
+            tmp = (tmp<<8)|args.at(0);
+
+            this->sp = tmp;
+
+            skipbytes = 3;
+            logger->log( spd::level::info, "LXI SP [{}]", tmp );
+
+            break;
+        }
         case inst::JMP:
         {
             skipbytes = 0;
-            auto test = readArgs( 2 );
+            auto args = readArgs( 2 );
 
             //Take the address bytes and stick them together.
             //Each is a byte, we want a 16 bit address.
-            uint16_t adr = test.at(1);
-            adr = (adr<<8)|test.at(0);
+            uint16_t adr = args.at(1);
+            adr = (adr<<8)|args.at(0);
 
             pc = adr;
-            logger->log( spd::level::info, "Jumping to {}...", numToHex(adr) );
+            logger->log( spd::level::info, "JMP {}", numToHex(adr) );
 
             break;
         }
