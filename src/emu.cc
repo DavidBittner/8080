@@ -12,8 +12,10 @@ Emulator_8080::Emulator_8080( std::shared_ptr<char> rom, int romlen ) :
     logger(spd::stdout_color_mt("emu"))
 {
     this->romlen = romlen;
-    this->pc = 0;
-    this->alive = true;
+    pc = 0;
+    alive = true;
+
+    this->status = 0;
 
     cur = inst::NONE;
 

@@ -49,7 +49,11 @@ private:
     //TODO: Add conditions (parity and such)
     enum class conds
     {
-
+        SIGN   = 1;
+        ZERO   = 2;
+        AUX_C  = 8;
+        PARITY = 32;
+        CARRY  = 128;
     };
 
 };
