@@ -19,6 +19,8 @@ Emulator_8080::Emulator_8080( std::shared_ptr<char> rom, int romlen ) :
 
     cur = inst::NONE;
 
+    a = 0; b = 0; c = 0; d = 0; e = 0; h = 0; l = 0;
+
     this->mem = new uint8_t[16000];
 
     logger->log( spd::level::info, "Initialized emulator." );
@@ -66,7 +68,9 @@ void Emulator_8080::step()
     }
 
     //If jumped, we don't want to increment the program counter at the end
-    int skipbytes = 0;
+    int  skipbytes = 0;
+    bool updateFlags = false;
+    int  lastOp = -1;
 
     unsigned char holder = rom.get()[pc];
     cur = static_cast<inst>(holder);
@@ -134,6 +138,19 @@ void Emulator_8080::step()
 
             break;
         }
+        case inst::ANID8:
+        {
+            skipbytes = 2;
+            auto args = readArgs( 1 );
+
+            logger->log( spd::level::info, "ANI {} {}", a, args.at(0));
+            this->a = a & args.at(0);
+            lastOp = this->a;
+
+            updateFlags = true;
+
+            break;
+        }
         default:
         {
             std::string hex = numToHex(static_cast<uint8_t>(cur));
@@ -143,6 +160,21 @@ void Emulator_8080::step()
         }
     }
     pc += skipbytes;
+
+    if( updateFlags )
+    {
+        if( lastOp >= 0 ){
+            set_flag( conds::SIGN, true );
+        }else {
+            set_flag( conds::SIGN, false );
+        }
+
+        if( lastOp == 0 ) {
+            set_flag( conds::ZERO, true );
+        }else{
+            set_flag( conds::ZERO, false );
+        }
+    }
 }
 
 bool Emulator_8080::isActive()

@@ -95,6 +95,7 @@ enum class inst
     LXIHD16  = 0x21,
     LXISPD16 = 0x31,
     JMP      = 0xC3,
+    ANID8    = 0xE6,
 };
 
 #endif
