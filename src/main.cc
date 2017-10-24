@@ -9,8 +9,10 @@
 #include "emu.hh"
 
 namespace spd = spdlog;
+
 int main( int argc, char **argv )
 {
+
     auto console = spd::stdout_color_mt("main");
     console->log( spd::level::info, "Initializing...");
 

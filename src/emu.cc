@@ -32,6 +32,30 @@ std::string numToHex( t in )
     return str.str().c_str();
 }
 
+bool Emulator_8080::get_flag( conds cond )
+{
+    uint8_t temp_status = this->status;
+    int lshift = 8-static_cast<int>(cond);
+    int rshift = static_cast<int>(cond);
+
+    temp_status = (temp_status << lshift) >> lshift;
+    temp_status = (temp_status >> rshift );
+
+    return temp_status;
+}
+
+void Emulator_8080::set_flag( conds cond, bool val  )
+{
+    if( val )
+    {
+        uint8_t setter = 1 << static_cast<int>(cond);
+        this->status = status | setter;
+    }else{
+        uint8_t setter = ~(1 << static_cast<int>(cond));
+        this->status = status & setter;
+    }
+}
+
 void Emulator_8080::step()
 {
     if( pc == romlen )

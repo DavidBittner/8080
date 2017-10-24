@@ -29,6 +29,7 @@ private:
     std::vector<uint8_t> readArgs( int count );
 
     bool get_flag( conds cond );
+    void set_flag( conds cond, bool val );
 
     bool alive;
 
@@ -49,11 +50,11 @@ private:
     //TODO: Add conditions (parity and such)
     enum class conds
     {
-        SIGN   = 1;
-        ZERO   = 2;
-        AUX_C  = 8;
-        PARITY = 32;
-        CARRY  = 128;
+        SIGN   = 0,
+        ZERO   = 1,
+        AUX_C  = 3,
+        PARITY = 5,
+        CARRY  = 7,
     };
 
 };
