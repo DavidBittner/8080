@@ -10,6 +10,10 @@
 
 #define MEMORY_SIZE 1024*1000
 
+
+#define BIT16_MAX 65535
+#define  BIT8_MAX 255
+
 enum class inst;
 
 class Emulator_8080
@@ -17,16 +21,18 @@ class Emulator_8080
 public:
     explicit Emulator_8080( std::shared_ptr<char> rom, int romlen );
 
-    bool isActive();
+    bool is_active();
     void step();
 
-    int getpc() const;
-    int getinst() const;
+    void print_status();
+
+    int get_pc() const;
+    int get_inst() const;
 
 private:
     enum class conds;
 
-    std::vector<uint8_t> readArgs( int count );
+    std::vector<uint8_t> read_args( int count );
 
     bool get_flag( conds cond );
     void set_flag( conds cond, bool val );
@@ -47,7 +53,6 @@ private:
     const std::shared_ptr<char> rom;
     std::shared_ptr<spdlog::logger> logger;
 
-    //TODO: Add conditions (parity and such)
     enum class conds
     {
         SIGN   = 0,

@@ -21,7 +21,7 @@ int main( int argc, char **argv )
         console->error( "No ROM supplied. Exiting." );
         return -1;
     }
-    
+
     console->log( spd::level::info, "Opening file: "+std::string(argv[1]));
     std::ifstream file( std::string(argv[1]), std::ios::binary | std::ios::ate | std::ios::in );
 
@@ -43,7 +43,7 @@ int main( int argc, char **argv )
     //Starting emulation
     Emulator_8080 emu(rom, size);
 
-    while( emu.isActive() )
+    while( emu.is_active() )
     {
         emu.step();
     }

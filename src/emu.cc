@@ -13,6 +13,7 @@ Emulator_8080::Emulator_8080( std::shared_ptr<char> rom, int romlen ) :
 {
     this->romlen = romlen;
     pc = 0;
+    sp = 0;
     alive = true;
 
     this->status = 0;
@@ -31,7 +32,20 @@ std::string numToHex( t in )
 {
     std::stringstream str;
     str << "0x" << std::setfill('0') << std::setw(sizeof(in)*2) << std::hex << static_cast<int>(in);
-    return str.str().c_str();
+    return str.str();
+}
+
+bool parity( uint8_t val )
+{
+
+    bool parity = false;
+    while( val )
+    {
+        parity = !parity;
+        val = val & (val - 1);
+    }
+
+    return parity;
 }
 
 bool Emulator_8080::get_flag( conds cond )
@@ -89,7 +103,7 @@ void Emulator_8080::step()
         }
         case inst::LXIBD16: 
         {
-            auto args = readArgs( 2 );
+            auto args = read_args( 2 );
 
             this->b = args.at(1);
             this->c = args.at(0);
@@ -101,7 +115,7 @@ void Emulator_8080::step()
         }
         case inst::MVIBD8:
         {
-            auto args = readArgs( 1 );
+            auto args = read_args( 1 );
 
             uint8_t immediate = rom.get()[pc+1];
             this->b = immediate;
@@ -111,7 +125,7 @@ void Emulator_8080::step()
         }
         case inst::LXISPD16:
         {
-            auto args = readArgs( 2 );
+            auto args = read_args( 2 );
 
             uint16_t tmp = args.at(1);
             tmp = (tmp<<8)|args.at(0);
@@ -126,7 +140,7 @@ void Emulator_8080::step()
         case inst::JMP:
         {
             skipbytes = 0;
-            auto args = readArgs( 2 );
+            auto args = read_args( 2 );
 
             //Take the address bytes and stick them together.
             //Each is a byte, we want a 16 bit address.
@@ -141,7 +155,7 @@ void Emulator_8080::step()
         case inst::ANID8:
         {
             skipbytes = 2;
-            auto args = readArgs( 1 );
+            auto args = read_args( 1 );
 
             logger->log( spd::level::info, "ANI {} {}", a, args.at(0));
             this->a = a & args.at(0);
@@ -174,15 +188,19 @@ void Emulator_8080::step()
         }else{
             set_flag( conds::ZERO, false );
         }
+
+        set_flag( conds::PARITY, parity(lastOp) );
     }
+
+    print_status();
 }
 
-bool Emulator_8080::isActive()
+bool Emulator_8080::is_active()
 {
     return alive;
 }
 
-std::vector<uint8_t> Emulator_8080::readArgs( int count )
+std::vector<uint8_t> Emulator_8080::read_args( int count )
 {
     std::vector<uint8_t> ret;
     for( int i = 1; i <= count; i++ )
@@ -202,4 +220,17 @@ std::vector<uint8_t> Emulator_8080::readArgs( int count )
 
     logger->log( spd::level::info, wrstr.c_str(), count );
     return ret;
+}
+
+void Emulator_8080::print_status()
+{
+    logger->log( spd::level::info, "REGS: A:{} B:{} C:{} D:{} E:{} H:{} L:{}", a, b, c, d, e, h, l );
+    logger->log( spd::level::info, "FLAG: SIGN:{} ZERO:{} AUXC:{} PARI:{} CARRY:{}", 
+                 get_flag(conds::SIGN), 
+                 get_flag(conds::ZERO),
+                 get_flag(conds::AUX_C),
+                 get_flag(conds::PARITY),
+                 get_flag(conds::CARRY) );
+
+    logger->log( spd::level::info, "PC:{} SP:{}", pc, sp );
 }
