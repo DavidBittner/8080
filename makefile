@@ -8,7 +8,7 @@ DEPFILES = $(SRC:.cc=.d)
 
 BIN = run.out
 
-FLAGS = -Wall -Werror -g -Iinc/ -I/usr/include/spdlog -std=c++14 -MMD
+FLAGS = -Wall -Werror -g -Iinc/ -I/usr/include/spdlog -std=c++14 -MMD -Ilibs/spdlog/include/spdlog
 LFLAGS = -pthread
 
 all: $(OBJS)
